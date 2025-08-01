@@ -1,0 +1,7 @@
+if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+    include(MEMVIZClangFlags)
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    include(MEMVIZMSVCFlags)
+else()
+    message(FATAL_ERROR "Unsupported compiler: ${CMAKE_CXX_COMPILER_ID}")
+endif()

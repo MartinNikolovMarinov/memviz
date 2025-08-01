@@ -1,0 +1,63 @@
+{
+	"version": 3,
+	"configurePresets": [
+		{
+			"name": "release-unix",
+			"displayName": "Release configuration",
+			"description": "Release configuration",
+			"binaryDir": "${sourceDir}/build",
+			"environment": {
+				"CC": "clang",
+				"CXX": "clang++"
+			},
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release",
+				"MEMVIZ_USE_ANSI_LOGGING": true,
+				"MEMVIZ_ENABLE_ASAN": false,
+				"MEMVIZ_ENABLE_UBSAN": false,
+				"MEMVIZ_ENABLE_TSAN": false,
+				"MEMVIZ_DEBUG": "OFF"
+			}
+		},
+		{
+			"name": "release-win",
+			"displayName": "Release configuration",
+			"description": "Release configuration",
+			"binaryDir": "${sourceDir}/build",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release",
+				"MEMVIZ_USE_ANSI_LOGGING": false,
+				"MEMVIZ_DEBUG": "OFF"
+			}
+		},
+		{
+			"name": "debug-unix",
+			"displayName": "Debug configuration",
+			"description": "Debug configuration",
+			"binaryDir": "${sourceDir}/build",
+			"environment": {
+				"CC": "clang",
+				"CXX": "clang++"
+			},
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"MEMVIZ_USE_ANSI_LOGGING": true,
+				"MEMVIZ_ENABLE_ASAN": false,
+				"MEMVIZ_ENABLE_UBSAN": true,
+				"MEMVIZ_ENABLE_TSAN": false,
+				"MEMVIZ_DEBUG": "ON"
+			}
+		},
+		{
+			"name": "debug-win",
+			"displayName": "Debug configuration",
+			"description": "Debug configuration",
+			"binaryDir": "${sourceDir}/build",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"MEMVIZ_USE_ANSI_LOGGING": false,
+				"MEMVIZ_DEBUG": "ON"
+			}
+		}
+	]
+}

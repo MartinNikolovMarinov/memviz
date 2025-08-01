@@ -1,0 +1,4 @@
+.cache
+.clangd
+clangd.yaml
+build
