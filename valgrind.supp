@@ -1,0 +1,9 @@
+{
+   XinitThreads suppression
+   Memcheck:Leak
+   match-leak-kinds: reachable
+   fun:malloc
+   fun:XInitThreads
+   fun:_ZN6memviz8Platform4initEPKcii
+   fun:main
+}

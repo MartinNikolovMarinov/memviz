@@ -108,4 +108,18 @@ endif()
 memviz_target_set_default_flags(${target_main} ${MEMVIZ_DEBUG} false)
 memviz_target_enable_sanitizers(${target_main} ${MEMVIZ_ENABLE_ASAN} ${MEMVIZ_ENABLE_UBSAN} ${MEMVIZ_ENABLE_TSAN})
 
-# ---------------------------------------- END Create Executable -------------------------------------------------------
+# ---------------------------------------- End Create Executable -------------------------------------------------------
+
+# ---------------------------------------- Begin Custom Targets --------------------------------------------------------
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    # Usage: cmake --build . --target run_valgrind
+    add_custom_target(run_valgrind
+        COMMAND valgrind --leak-check=full --suppressions=${CMAKE_SOURCE_DIR}/valgrind.supp $<TARGET_FILE:${target_main}>
+        DEPENDS ${target_main}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        COMMENT "Running ${target_main} with Valgrind (GCC only)"
+    )
+endif()
+
+# ---------------------------------------- End Custom Targets ----------------------------------------------------------

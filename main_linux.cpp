@@ -1,6 +1,7 @@
 #include "basic.h"
 
 #include "platform.h"
+#include "systems/logger.h"
 #include <error.h>
 
 using namespace memviz;
@@ -47,6 +48,8 @@ int main(int, const char**) {
     basicInit();
     defer { basicShutdown(); };
 
+    loggerSystemSetLogLevelToTrace();
+
     Error initErr = Platform::init("Example", 1280, 720);
     Assert(initErr == Error::OK);
     defer { Platform::shutdown(); };
@@ -59,9 +62,6 @@ int main(int, const char**) {
             break;
         }
 
-        // if (auto err = Platform::pollEvents(false); !err.isOk()) {
-        //     return core::unexpected(err);
-        // }
         // Renderer::drawFrame();
     }
 

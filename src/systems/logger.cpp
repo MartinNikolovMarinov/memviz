@@ -15,6 +15,13 @@ void loggerSystemShutdown() {
     core::loggerDestroy();
 }
 
+void loggerSystemSetLogLevelToTrace() { core::loggerSetLevel(core::LogLevel::L_TRACE); }
+void loggerSystemSetLogLevelToDebug() { core::loggerSetLevel(core::LogLevel::L_DEBUG); }
+void loggerSystemSetLogLevelToInfo() { core::loggerSetLevel(core::LogLevel::L_INFO); }
+void loggerSystemSetLogLevelToWarning() { core::loggerSetLevel(core::LogLevel::L_WARNING); }
+void loggerSystemSetLogLevelToError() { core::loggerSetLevel(core::LogLevel::L_ERROR); }
+void loggerSystemSetLogLevelToFatal() { core::loggerSetLevel(core::LogLevel::L_FATAL); }
+
 core::LoggerCreateInfo loggerSystemCreateInfo() {
     core::LoggerCreateInfo ret = core::LoggerCreateInfo::createDefault();
     ret.useAnsi = true;

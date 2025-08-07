@@ -37,6 +37,13 @@ core::LoggerCreateInfo loggerSystemCreateInfo();
 void loggerSystemInit();
 void loggerSystemShutdown();
 
+void loggerSystemSetLogLevelToTrace();
+void loggerSystemSetLogLevelToDebug();
+void loggerSystemSetLogLevelToInfo();
+void loggerSystemSetLogLevelToWarning();
+void loggerSystemSetLogLevelToError();
+void loggerSystemSetLogLevelToFatal();
+
 void __debug__testLoggerSetup();
 
 } // memviz
