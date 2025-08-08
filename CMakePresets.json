@@ -7,6 +7,13 @@
             "description": "Release configuration",
             "binaryDir": "${sourceDir}/build",
             "environment": {
+                "VK_LAYER_PATH": "$VULKAN_SDK/share/vulkan/explicit_layer.d",
+                "VK_ADD_LAYER_PATH": "$VULKAN_TOOLSET/Vulkan-ValidationLayers/build/etc/vulkan/explicit_layer.d:$HOME/Vulkan/renderdock_1.36/etc/vulkan/explicit_layer.d",
+
+                "VK_KHRONOS_PROFILES_PROFILE_NAME": "VP_LUNARG_desktop_portability_2021",
+                "VK_KHRONOS_PROFILES_VALIDATE": "1",
+                "VK_KHRONOS_PROFILES_EMULATE_PORTABILITY": "1",
+
                 "CC": "clang",
                 "CXX": "clang++"
             },
@@ -25,6 +32,11 @@
             "displayName": "Release configuration",
             "description": "Release configuration",
             "binaryDir": "${sourceDir}/build",
+            "environment": {
+                "VK_KHRONOS_PROFILES_PROFILE_NAME": "VP_LUNARG_desktop_portability_2021",
+                "VK_KHRONOS_PROFILES_VALIDATE": "1",
+                "VK_KHRONOS_PROFILES_EMULATE_PORTABILITY": "1"
+            },
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "MEMVIZ_USE_ANSI_LOGGING": false,
@@ -38,6 +50,10 @@
             "description": "Debug configuration",
             "binaryDir": "${sourceDir}/build",
             "environment": {
+                "VK_KHRONOS_PROFILES_PROFILE_NAME": "VP_LUNARG_desktop_portability_2021",
+                "VK_KHRONOS_PROFILES_VALIDATE": "1",
+                "VK_KHRONOS_PROFILES_EMULATE_PORTABILITY": "1",
+
                 "CC": "clang",
                 "CXX": "clang++"
             },
@@ -56,6 +72,11 @@
             "displayName": "Debug configuration",
             "description": "Debug configuration",
             "binaryDir": "${sourceDir}/build",
+            "environment": {
+                "VK_KHRONOS_PROFILES_PROFILE_NAME": "VP_LUNARG_desktop_portability_2021",
+                "VK_KHRONOS_PROFILES_VALIDATE": "1",
+                "VK_KHRONOS_PROFILES_EMULATE_PORTABILITY": "1"
+            },
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "MEMVIZ_USE_ANSI_LOGGING": false,

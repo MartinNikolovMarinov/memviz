@@ -15,16 +15,18 @@ enum LogTag : i32 {
     PLATFORM_TAG = 1,
     USER_INPUT_TAG = 2,
     RENDERER_TAG = 3,
+    RENDERER_VALIDATION_TAG = 4,
 
     SENTINEL
 };
 
 constexpr const char* logTagToCStr(LogTag t) {
     switch (t) {
-        case LogTag::ALL_TAG:        return "ALL";
-        case LogTag::PLATFORM_TAG:   return "PLATFORM";
-        case LogTag::USER_INPUT_TAG: return "USER_INPUT";
-        case LogTag::RENDERER_TAG:   return "RENDERER";
+        case LogTag::ALL_TAG:                 return "ALL";
+        case LogTag::PLATFORM_TAG:            return "PLATFORM";
+        case LogTag::USER_INPUT_TAG:          return "USER_INPUT";
+        case LogTag::RENDERER_TAG:            return "RENDERER";
+        case LogTag::RENDERER_VALIDATION_TAG: return "RENDERER_VALIDATION";
 
         case LogTag::SENTINEL: [[fallthrough]];
         default:

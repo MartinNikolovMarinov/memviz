@@ -50,15 +50,17 @@ int main(int, const char**) {
     basicInit();
     defer { basicShutdown(); };
 
-    // loggerSystemSetLogLevelToTrace();
+    loggerSystemSetLogLevelToTrace();
 
     Error initErr = Platform::init("Example", 1280, 720);
     Assert(initErr == Error::OK);
     defer { Platform::shutdown(); };
 
     Renderer::CrateInfo rinfo = {};
+    rinfo.appName = "Example";
     Error renderInit = Renderer::init(std::move(rinfo));
     Assert(renderInit == Error::OK);
+    defer { Renderer::shutdown(); };
 
     registerEventHandlers();
 

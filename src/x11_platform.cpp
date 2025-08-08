@@ -1,5 +1,7 @@
-#include "basic.h"
 #include "platform.h"
+
+#include "basic.h"
+#include "error.h"
 
 #include "systems/logger.h"
 
@@ -7,6 +9,10 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <error.h>
+
+#if defined(MEMVIZ_USE_VULKAN)
+#include "systems/renderer/vulkan_backend.h"
+#endif
 
 namespace memviz {
 
@@ -303,26 +309,27 @@ void Platform::requiredVulkanExtsCount(i32& count) {
     count = 1;
 }
 
-void Platform::requiredVulkanExts(const char**) {
-    // TODO: unconnect once Vulkan SDK is linked.
-    // extensions[0] = VK_KHR_XLIB_SURFACE_EXTENSION_NAME;
+void Platform::requiredVulkanExts([[maybe_unused]] const char** extensions) {
+#if defined(MEMVIZ_USE_VULKAN)
+    extensions[0] = VK_KHR_XLIB_SURFACE_EXTENSION_NAME;
+#endif
 }
 
-Error Platform::createVulkanSurface(VkInstance, VkSurfaceKHR&) {
+Error Platform::createVulkanSurface(VkInstance instance, VkSurfaceKHR& outSurface) {
+#if defined(MEMVIZ_USE_VULKAN)
     Assert(g_initialized, "Platform Layer needs to be initialized");
 
-    // TODO: unconnect once Vulkan SDK is linked.
+    VkXlibSurfaceCreateInfoKHR createInfo{};
+    createInfo.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
+    createInfo.dpy = g_display;
+    createInfo.window = g_window;
 
-    // VkXlibSurfaceCreateInfoKHR createInfo{};
-    // createInfo.sType = VK_STRUCTURE_TYPE_XLIB_SURFACE_CREATE_INFO_KHR;
-    // createInfo.dpy = g_display;
-    // createInfo.window = g_window;
-
-    // VkResult vres = vkCreateXlibSurfaceKHR(instance, &createInfo, nullptr, &outSurface);
-    // if (vres != VK_SUCCESS) {
-    //     // This could technically be a render error as well.
-    //     return createPltErr(FAILED_TO_CREATE_X11_KHR_XLIB_SURFACE, "Failed to create Xlib Vulkan surface");
-    // }
+    VkResult vres = vkCreateXlibSurfaceKHR(instance, &createInfo, nullptr, &outSurface);
+    if (vres != VK_SUCCESS) {
+        // This could technically be a render error as well.
+        return Error::FAILED_TO_CREATE_X11_KHR_XLIB_SURFACE;
+    }
+#endif
 
     return Error::OK;
 }

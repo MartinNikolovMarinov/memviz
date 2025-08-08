@@ -14,6 +14,10 @@ enum struct Error {
     MEMVIZ_X11_ERROR_LIST
 #undef MEMVIZ_PLT_ERROR_ITEM
 
+#define MEMVIZ_PLT_ERROR_ITEM(name, msg) name,
+    MEMVIZ_VULKAN_ERROR_LIST
+#undef MEMVIZ_PLT_ERROR_ITEM
+
     SENTINEL
 };
 
@@ -31,6 +35,10 @@ constexpr inline const char* errToCStr(Error err) {
 
 #define MEMVIZ_PLT_ERROR_ITEM(name, msg) case Error::name: return msg;
         MEMVIZ_X11_ERROR_LIST
+#undef MEMVIZ_PLT_ERROR_ITEM
+
+#define MEMVIZ_PLT_ERROR_ITEM(name, msg) case Error::name: return msg;
+        MEMVIZ_VULKAN_ERROR_LIST
 #undef MEMVIZ_PLT_ERROR_ITEM
 
         case Error::SENTINEL: [[fallthrough]];

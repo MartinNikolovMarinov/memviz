@@ -7,4 +7,8 @@ namespace memviz {
     MEMVIZ_PLT_ERROR_ITEM(FAILED_TO_CREATE_X11_WINDOW, "Failed to create X11 window") \
     MEMVIZ_PLT_ERROR_ITEM(FAILED_TO_INITIALIZE_X11_THREADS, "Failed to initialize x11 threads")
 
+#define MEMVIZ_VULKAN_ERROR_LIST \
+    MEMVIZ_PLT_ERROR_ITEM(FAILED_TO_CREATE_X11_KHR_XLIB_SURFACE, "Failed to create Xlib Vulkan surface") \
+    MEMVIZ_PLT_ERROR_ITEM(FAILED_TO_CREATE_VK_INSTANCE, "Failed to create VkInstance") \
+
 } // memviz

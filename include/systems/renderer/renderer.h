@@ -12,9 +12,12 @@ namespace memviz {
 using namespace coretypes;
 
 struct Renderer {
-    struct CrateInfo {};
+    struct CrateInfo {
+        const char* appName;
+    };
 
     static Error (*init)(CrateInfo&& info);
+    static void (*shutdown)(void);
 };
 
 } // memviz

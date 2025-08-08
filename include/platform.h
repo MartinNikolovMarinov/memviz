@@ -8,12 +8,12 @@
 #include "error.h"
 #include "user_input.h"
 
+typedef struct VkInstance_T* VkInstance;
+typedef struct VkSurfaceKHR_T* VkSurfaceKHR;
+
 namespace memviz {
 
 using namespace coretypes;
-
-typedef struct VkInstance_T* VkInstance;
-typedef struct VkSurfaceKHR_T* VkSurfaceKHR;
 
 using WindowCloseCallback = void (*)();
 using WindowResizeCallback = void (*)(i32 w, i32 h);

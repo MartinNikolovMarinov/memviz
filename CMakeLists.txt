@@ -97,20 +97,20 @@ endif()
 # ---------------------------------------- Begin Create Executable -----------------------------------------------------
 
 add_executable(${target_main} ${memviz_src})
-target_link_libraries(${target_main} PUBLIC
+target_link_libraries(${target_main} PRIVATE
     core # link with corelib
 )
 target_include_directories(${target_main} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
-target_compile_definitions(${target_main} PUBLIC
+target_compile_definitions(${target_main} PRIVATE
     "MEMVIZ_DEBUG=$<BOOL:${MEMVIZ_DEBUG}>"
     "MEMVIZ_USE_ANSI_LOGGING=$<BOOL:${MEMVIZ_USE_ANSI_LOGGING}>"
     MEMVIZ_ASSETS="${CMAKE_BINARY_DIR}/assets"
 )
 
 if(MEMVIZ_USE_VULKAN)
-    target_compile_definitions(${target_main} PUBLIC MEMVIZ_USE_VULKAN=1)
+    target_compile_definitions(${target_main} PRIVATE -DMEMVIZ_USE_VULKAN)
 endif()
 
 if(OS STREQUAL "linux")
@@ -125,18 +125,24 @@ if(OS STREQUAL "linux")
         log_fatal("VULKAN_SDK environment variable is required but not set.")
     endif()
 
+    log_info("VK_ADD_LAYER_PATH: $ENV{VK_ADD_LAYER_PATH}")
+    log_info("VK_LAYER_PATH: $ENV{VK_LAYER_PATH}")
+    log_info("VK_KHRONOS_PROFILES_PROFILE_NAME: $ENV{VK_KHRONOS_PROFILES_PROFILE_NAME}")
+    log_info("VK_KHRONOS_PROFILES_VALIDATE: $ENV{VK_KHRONOS_PROFILES_VALIDATE}")
+    log_info("VK_KHRONOS_PROFILES_EMULATE_PORTABILITY: $ENV{VK_KHRONOS_PROFILES_EMULATE_PORTABILITY}")
+
     set(VULKAN_SDK_ROOT "$ENV{VULKAN_SDK}")
     set(VULKAN_BIN_PATH "${VULKAN_SDK_ROOT}/bin")
     set(VULKAN_LIB_PATH "${VULKAN_SDK_ROOT}/lib")
 
-    # Check PATH contains $VULKAN_SDK/bin
-    if(NOT "$ENV{PATH}" MATCHES "${VULKAN_BIN_PATH}")
-        log_warning("PATH does not contain ${VULKAN_BIN_PATH} — Vulkan tools like 'glslc' may not be found.")
+    # Check LD_LIBRARY_PATH contains $VULKAN_SDK/lib
+    if(NOT "$ENV{LD_LIBRARY_PATH}" MATCHES "${VULKAN_LIB_PATH}")
+        log_fatal("LD_LIBRARY_PATH does not contain ${VULKAN_LIB_PATH} — Vulkan runtime will fail to load.")
     endif()
 
-    # Check LD_LIBRARY_PATH contains $VULKAN_SDK/lib
-    if(UNIX AND NOT "$ENV{LD_LIBRARY_PATH}" MATCHES "${VULKAN_LIB_PATH}")
-        log_warning("LD_LIBRARY_PATH does not contain ${VULKAN_LIB_PATH} — Vulkan runtime may fail to load.")
+    # Check PATH contains $VULKAN_SDK/bin
+    if(NOT "$ENV{PATH}" MATCHES "${VULKAN_BIN_PATH}")
+        log_fatal("PATH does not contain ${VULKAN_BIN_PATH} — Vulkan tools like 'glslc' wont be found.")
     endif()
 
     # Optional VK_LAYER_PATH
@@ -146,6 +152,8 @@ if(OS STREQUAL "linux")
 
     find_package(Vulkan REQUIRED)
     target_link_libraries(${target_main} PRIVATE ${Vulkan_LIBRARIES})
+    target_include_directories(${target_main} PRIVATE ${Vulkan_INCLUDE_DIRS})
+    target_compile_definitions(${target_main} PRIVATE -DVK_ENABLE_BETA_EXTENSIONS)
 endif()
 
 memviz_target_set_default_flags(${target_main} ${MEMVIZ_DEBUG} false)
