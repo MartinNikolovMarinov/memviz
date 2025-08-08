@@ -40,6 +40,7 @@ option(MEMVIZ_USE_ANSI_LOGGING "Use ANSI in logs" OFF)
 option(MEMVIZ_ENABLE_ASAN "Enable ASAN" OFF)
 option(MEMVIZ_ENABLE_UBSAN "Enable UBSAN" OFF)
 option(MEMVIZ_ENABLE_TSAN "Enable TSAN" OFF)
+option(MEMVIZ_USE_VULKAN "Enable Vulkan" OFF)
 
 # Print Selected Options:
 
@@ -54,6 +55,10 @@ log_info("ANSI logging:              ${MEMVIZ_USE_ANSI_LOGGING}")
 log_info("ASAN Enabled:              ${MEMVIZ_ENABLE_ASAN}")
 log_info("UBSAN Enabled:             ${MEMVIZ_ENABLE_UBSAN}")
 log_info("TSAN Enabled:              ${MEMVIZ_ENABLE_TSAN}")
+if(MEMVIZ_USE_VULKAN)
+log_info("Renderer:                  Vulkan")
+endif()
+
 log_info("---------------------------------------------")
 
 # ---------------------------------------- End Options -----------------------------------------------------------------
@@ -70,7 +75,7 @@ if(OS STREQUAL "linux")
     set(memviz_src ${memviz_src}
         main_linux.cpp
 
-        src/x11_platform.cpp # temporary here
+        src/x11_platform.cpp # TODO: check this when Wayland support is added.
     )
 elseif(OS STREQUAL "darwin")
     log_fatal("OS not supported yet!")
@@ -78,6 +83,14 @@ elseif(OS STREQUAL "windows")
     log_fatal("OS not supported yet!")
 endif()
 
+if(MEMVIZ_USE_VULKAN)
+    set(memviz_src ${memviz_src}
+        src/systems/renderer/vulkan_backend.cpp
+    )
+else()
+    # TODO: Temporarily supporting only vulkan as a renderer.
+    log_fatal("No supported renderer backend found")
+endif()
 
 # ---------------------------------------- End Declare Source Files ----------------------------------------------------
 
@@ -87,7 +100,7 @@ add_executable(${target_main} ${memviz_src})
 target_link_libraries(${target_main} PUBLIC
     core # link with corelib
 )
-target_include_directories(${target_main} PUBLIC
+target_include_directories(${target_main} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 target_compile_definitions(${target_main} PUBLIC
@@ -96,13 +109,43 @@ target_compile_definitions(${target_main} PUBLIC
     MEMVIZ_ASSETS="${CMAKE_BINARY_DIR}/assets"
 )
 
+if(MEMVIZ_USE_VULKAN)
+    target_compile_definitions(${target_main} PUBLIC MEMVIZ_USE_VULKAN=1)
+endif()
+
 if(OS STREQUAL "linux")
+    # TODO: What if the system is Wayland? How can that be detected?
+
+    # X11 dependencies
     find_package(X11 REQUIRED)
-    find_package(Vulkan REQUIRED)  # Link with Vulkan from system
-    target_link_libraries(${target_main} PRIVATE ${Vulkan_LIBRARIES} ${X11_LIBRARIES})
+    target_link_libraries(${target_main} PRIVATE ${X11_LIBRARIES})
     target_compile_definitions(${target_main} PRIVATE -DUSE_X11)
 
-    # TODO: What if the system is Wayland? How can that be detected?
+    if(NOT DEFINED ENV{VULKAN_SDK})
+        log_fatal("VULKAN_SDK environment variable is required but not set.")
+    endif()
+
+    set(VULKAN_SDK_ROOT "$ENV{VULKAN_SDK}")
+    set(VULKAN_BIN_PATH "${VULKAN_SDK_ROOT}/bin")
+    set(VULKAN_LIB_PATH "${VULKAN_SDK_ROOT}/lib")
+
+    # Check PATH contains $VULKAN_SDK/bin
+    if(NOT "$ENV{PATH}" MATCHES "${VULKAN_BIN_PATH}")
+        log_warning("PATH does not contain ${VULKAN_BIN_PATH} — Vulkan tools like 'glslc' may not be found.")
+    endif()
+
+    # Check LD_LIBRARY_PATH contains $VULKAN_SDK/lib
+    if(UNIX AND NOT "$ENV{LD_LIBRARY_PATH}" MATCHES "${VULKAN_LIB_PATH}")
+        log_warning("LD_LIBRARY_PATH does not contain ${VULKAN_LIB_PATH} — Vulkan runtime may fail to load.")
+    endif()
+
+    # Optional VK_LAYER_PATH
+    if(NOT DEFINED ENV{VK_LAYER_PATH} AND NOT MEMVIZ_DEBUG)
+        log_warning("VK_LAYER_PATH is not set in debug. Vulkan validation layers may not work.")
+    endif()
+
+    find_package(Vulkan REQUIRED)
+    target_link_libraries(${target_main} PRIVATE ${Vulkan_LIBRARIES})
 endif()
 
 memviz_target_set_default_flags(${target_main} ${MEMVIZ_DEBUG} false)

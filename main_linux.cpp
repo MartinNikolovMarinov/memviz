@@ -2,9 +2,11 @@
 
 #include "platform.h"
 #include "systems/logger.h"
+#include "systems/renderer/renderer.h"
 #include <error.h>
 
 using namespace memviz;
+
 
 bool g_appIsRunning = true;
 
@@ -48,11 +50,15 @@ int main(int, const char**) {
     basicInit();
     defer { basicShutdown(); };
 
-    loggerSystemSetLogLevelToTrace();
+    // loggerSystemSetLogLevelToTrace();
 
     Error initErr = Platform::init("Example", 1280, 720);
     Assert(initErr == Error::OK);
     defer { Platform::shutdown(); };
+
+    Renderer::CrateInfo rinfo = {};
+    Error renderInit = Renderer::init(std::move(rinfo));
+    Assert(renderInit == Error::OK);
 
     registerEventHandlers();
 

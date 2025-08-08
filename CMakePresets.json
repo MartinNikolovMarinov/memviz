@@ -16,6 +16,7 @@
                 "MEMVIZ_ENABLE_ASAN": false,
                 "MEMVIZ_ENABLE_UBSAN": false,
                 "MEMVIZ_ENABLE_TSAN": false,
+                "MEMVIZ_USE_VULKAN": true,
                 "MEMVIZ_DEBUG": "OFF"
             }
         },
@@ -27,6 +28,7 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "MEMVIZ_USE_ANSI_LOGGING": false,
+                "MEMVIZ_USE_VULKAN": true,
                 "MEMVIZ_DEBUG": "OFF"
             }
         },
@@ -45,6 +47,7 @@
                 "MEMVIZ_ENABLE_ASAN": false,
                 "MEMVIZ_ENABLE_UBSAN": true,
                 "MEMVIZ_ENABLE_TSAN": false,
+                "MEMVIZ_USE_VULKAN": true,
                 "MEMVIZ_DEBUG": "ON"
             }
         },
@@ -56,6 +59,7 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Debug",
                 "MEMVIZ_USE_ANSI_LOGGING": false,
+                "MEMVIZ_USE_VULKAN": true,
                 "MEMVIZ_DEBUG": "ON"
             }
         }
