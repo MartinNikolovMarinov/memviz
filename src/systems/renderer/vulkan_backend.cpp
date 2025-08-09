@@ -62,7 +62,7 @@ constexpr addr_size LAYERS_COUNT = CORE_C_ARRLEN(LAYERS);
 // ------------------------------------------ BEGIN RENDERER STATE -----------------------------------------------------
 
 // ExtPropsList g_allSupportedInstExts;
-// LayerPropsList g_allSupportedInstLayers;
+LayerPropsList g_allSupportedInstLayers;
 
 VkInstance g_instance = VK_NULL_HANDLE;
 
@@ -78,9 +78,9 @@ void createInstance(const RendererCreateInfo& rendererInfo);
 // void          logInstExtPropsList(const ExtPropsList& list);
 // bool          checkSupportForInstExtension(const char* extensionName);
 
-// LayerPropsList* getAllSupportedInstLayers(bool useCache = true);
-// void            logInstLayersList(const LayerPropsList& list);
-// bool            checkSupportForInstLayer(const char* name);
+LayerPropsList* getAllSupportedInstLayers(bool invalidateCache = false);
+void            logInstLayersList(const LayerPropsList& list);
+bool            checkSupportForInstLayer(const char* name);
 
 // GPUDeviceList* getAllSupportedPhysicalDevices(VkInstance instance, bool useCache = true);
 // void           logPhysicalDevicesList(const GPUDeviceList& list);
@@ -109,8 +109,7 @@ void logVulkanVersion();
 
 Error vulkanInit(RendererCreateInfo&& rendererInfo) {
     logVulkanVersion();
-
-    // TODO: debug log the supported device and instance extensions?
+    logInstLayersList(*getAllSupportedInstLayers());
 
     createInstance(rendererInfo);
 
@@ -167,18 +166,17 @@ void createInstance(const RendererCreateInfo& rendererInfo) {
     instanceCreateInfo.ppEnabledExtensionNames = extensions.data();
 
 #ifdef MEMVIZ_VALIDATION_LAYERS_ENABLED
-    // FIXME: Implement the layer logic
-    // logInfoTagged(RENDERER_TAG, "Enabled layers:");
-    // for (addr_size i = 0; i < LAYERS_COUNT; i++) {
-    //     const char* layer = LAYERS[i];
-    //     if (checkSupportForInstLayer(layer)) {
-    //         logInfoTagged(RENDERER_TAG, "\t{}", layer);
-    //     }
-    //     else {
-    //         logErrTagged(RENDERER_TAG, "{} layer is not supported", layer);
-    //         Panic(false, "Missing Vulkan Instance Layer"); // this should not happen
-    //     }
-    // }
+    logInfoTagged(RENDERER_TAG, "Enabled layers:");
+    for (addr_size i = 0; i < LAYERS_COUNT; i++) {
+        const char* layer = LAYERS[i];
+        if (checkSupportForInstLayer(layer)) {
+            logInfoTagged(RENDERER_TAG, "\t{}", layer);
+        }
+        else {
+            logErrTagged(RENDERER_TAG, "{} layer is not supported", layer);
+            Panic(false, "Missing Vulkan Instance Layer"); // this should not happen
+        }
+    }
 
     instanceCreateInfo.enabledLayerCount = LAYERS_COUNT;
     instanceCreateInfo.ppEnabledLayerNames = LAYERS;
@@ -193,6 +191,41 @@ void createInstance(const RendererCreateInfo& rendererInfo) {
         vkCreateInstance(&instanceCreateInfo, nullptr, &g_instance),
         "Failed to create VkInstance"
     );
+}
+
+LayerPropsList* getAllSupportedInstLayers(bool invalidateCache) {
+    if (!invalidateCache && !g_allSupportedInstLayers.empty()) {
+        return &g_allSupportedInstLayers;
+    }
+
+    u32 layerCount;
+    VK_MUST(vkEnumerateInstanceLayerProperties(&layerCount, nullptr));
+
+    auto layList = LayerPropsList(layerCount, VkLayerProperties{});
+    VK_MUST(vkEnumerateInstanceLayerProperties(&layerCount, layList.data()));
+
+    g_allSupportedInstLayers = std::move(layList);
+    return &g_allSupportedInstLayers;
+}
+
+void logInstLayersList(const LayerPropsList& list) {
+    logInfoTagged(RENDERER_TAG, "Layers ({})", list.len());
+    for (addr_size i = 0; i < list.len(); i++) {
+        logInfoTagged(RENDERER_TAG, "\tname: {}, description: {}, spec version: {}, impl version: {}",
+                      list[i].layerName, list[i].description, list[i].specVersion, list[i].implementationVersion);
+    }
+}
+
+bool checkSupportForInstLayer(const char* name) {
+    const LayerPropsList& layers = *getAllSupportedInstLayers();
+    for (addr_size i = 0; i < layers.len(); i++) {
+        VkLayerProperties p = layers[i];
+        if (core::memcmp(p.layerName, name, core::cstrLen(name)) == 0) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 [[nodiscard]] VkDebugUtilsMessengerEXT vulkanCreateDebugMessenger(VkInstance instance) {
